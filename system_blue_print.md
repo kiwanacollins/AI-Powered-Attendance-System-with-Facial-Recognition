@@ -181,7 +181,3 @@ Implement MongoDB indexing for fast queries
 Utilize React Context for state management
 
 Add loading skeletons for better UX
-
-Include unit tests with Jest/Testing Library
-
-Configure CI/CD pipeline for deployments

@@ -1,0 +1,430 @@
+[
+  {
+    "weightsManifest": [
+      {
+        "paths": [
+          "ssd_mobilenetv1_model-shard1",
+          "ssd_mobilenetv1_model-shard2"
+        ],
+        "weights": [
+          {
+            "name": "conv_0/filters",
+            "shape": [
+              3,
+              3,
+              3,
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_0/bias",
+            "shape": [
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_1/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              32,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_1/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              32,
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_1/bias",
+            "shape": [
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_2/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              64,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_2/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              64,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_2/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_3/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              128,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_3/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              128,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_3/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_4/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              128,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_4/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              128,
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_4/bias",
+            "shape": [
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_5/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              256,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_5/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              256,
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_5/bias",
+            "shape": [
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_6/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              256,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_6/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              256,
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_6/bias",
+            "shape": [
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_7/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              512,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_7/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              512,
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_7/bias",
+            "shape": [
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_8/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              512,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_8/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              512,
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_8/bias",
+            "shape": [
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_9/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              512,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_9/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              512,
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_9/bias",
+            "shape": [
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_10/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              512,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_10/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              512,
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_10/bias",
+            "shape": [
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_11/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              512,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_11/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              512,
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_11/bias",
+            "shape": [
+              512
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_12/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              512,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_12/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              512,
+              1024
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_12/bias",
+            "shape": [
+              1024
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_13/depthwise_filter",
+            "shape": [
+              3,
+              3,
+              1024,
+              1
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_13/pointwise_filter",
+            "shape": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_13/bias",
+            "shape": [
+              1024
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_14/filters",
+            "shape": [
+              1,
+              1,
+              512,
+              6
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_14/bias",
+            "shape": [
+              6
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_15/filters",
+            "shape": [
+              1,
+              1,
+              1024,
+              6
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv_15/bias",
+            "shape": [
+              6
+            ],
+            "dtype": "float32"
+          }
+        ]
+      }
+    ],
+    "modelTopology": {
+      "class_name": "Model",
+      "config": {
+        "name": "ssd_mobilenetv1",
+        "layers": [],
+        "input_layers": [],
+        "output_layers": []
+      },
+      "keras_version": "tfjs-layers 1.0.0",
+      "backend": "tensor_flow.js"
+    },
+    "format": "layers-model",
+    "generatedBy": "keras2 (tf.keras)",
+    "convertedBy": "TensorFlow.js Converter"
+  }
+]

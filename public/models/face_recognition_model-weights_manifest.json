@@ -1,0 +1,298 @@
+[
+  {
+    "weightsManifest": [
+      {
+        "paths": [
+          "face_recognition_model-shard1",
+          "face_recognition_model-shard2"
+        ],
+        "weights": [
+          {
+            "name": "conv32_down/conv/filters",
+            "shape": [
+              7,
+              7,
+              3,
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_down/conv/bias",
+            "shape": [
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_1/conv/filters",
+            "shape": [
+              3,
+              3,
+              32,
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_1/conv/bias",
+            "shape": [
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_2/conv/filters",
+            "shape": [
+              3,
+              3,
+              32,
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_2/conv/bias",
+            "shape": [
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_3/conv/filters",
+            "shape": [
+              3,
+              3,
+              32,
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv32_3/conv/bias",
+            "shape": [
+              32
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_down/conv/filters",
+            "shape": [
+              3,
+              3,
+              32,
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_down/conv/bias",
+            "shape": [
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_1/conv/filters",
+            "shape": [
+              3,
+              3,
+              64,
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_1/conv/bias",
+            "shape": [
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_2/conv/filters",
+            "shape": [
+              3,
+              3,
+              64,
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_2/conv/bias",
+            "shape": [
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_3/conv/filters",
+            "shape": [
+              3,
+              3,
+              64,
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv64_3/conv/bias",
+            "shape": [
+              64
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv128_down/conv/filters",
+            "shape": [
+              3,
+              3,
+              64,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv128_down/conv/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv128_1/conv/filters",
+            "shape": [
+              3,
+              3,
+              128,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv128_1/conv/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv128_2/conv/filters",
+            "shape": [
+              3,
+              3,
+              128,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv128_2/conv/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_down/conv/filters",
+            "shape": [
+              3,
+              3,
+              128,
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_down/conv/bias",
+            "shape": [
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_1/conv/filters",
+            "shape": [
+              3,
+              3,
+              256,
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_1/conv/bias",
+            "shape": [
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_2/conv/filters",
+            "shape": [
+              3,
+              3,
+              256,
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_2/conv/bias",
+            "shape": [
+              256
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_down_out/conv/filters",
+            "shape": [
+              3,
+              3,
+              256,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "conv256_down_out/conv/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "fc/weights",
+            "shape": [
+              7168,
+              128
+            ],
+            "dtype": "float32"
+          },
+          {
+            "name": "fc/bias",
+            "shape": [
+              128
+            ],
+            "dtype": "float32"
+          }
+        ]
+      }
+    ],
+    "modelTopology": {
+      "class_name": "Model",
+      "config": {
+        "name": "face_recognition_model",
+        "layers": [],
+        "input_layers": [],
+        "output_layers": []
+      },
+      "keras_version": "tfjs-layers 1.0.0",
+      "backend": "tensor_flow.js"
+    },
+    "format": "layers-model",
+    "generatedBy": "keras2 (tf.keras)",
+    "convertedBy": "TensorFlow.js Converter"
+  }
+]
