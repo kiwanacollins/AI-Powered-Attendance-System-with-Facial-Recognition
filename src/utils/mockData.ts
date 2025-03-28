@@ -1,9 +1,22 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Student, Course, AttendanceRecord, SystemLog } from '../types';
 
+// Generate consistent mock face descriptors (128-dimensional vector)
+const generateConsistentDescriptor = (seed: number): Float32Array => {
+  const descriptor = new Float32Array(128);
+  const random = (x: number) => Math.sin(x * 100) * 0.5 + 0.5; // Deterministic "random" function
+  
+  for (let i = 0; i < 128; i++) {
+    // Create a consistent but unique value for each position in the descriptor
+    descriptor[i] = random(seed + (i / 128)) * 0.8 - 0.4; // Values roughly between -0.4 and 0.4
+  }
+  
+  return descriptor;
+};
+
 // Generate realistic mock data for development and testing
 
-// Mock Students
+// Mock Students with consistent face descriptors
 export const mockStudents: Student[] = [
   {
     id: uuidv4(),
@@ -13,6 +26,7 @@ export const mockStudents: Student[] = [
     enrolledCourses: ['course1', 'course2', 'course3'],
     profileImageUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
     consentGiven: true,
+    faceDescriptor: Array.from(generateConsistentDescriptor(1)), // Add consistent descriptor
     contactInfo: {
       phone: '555-123-4567',
       address: '123 University Ave, College Town',
@@ -28,6 +42,7 @@ export const mockStudents: Student[] = [
     enrolledCourses: ['course1', 'course3'],
     profileImageUrl: 'https://randomuser.me/api/portraits/men/2.jpg',
     consentGiven: true,
+    faceDescriptor: Array.from(generateConsistentDescriptor(2)), // Add consistent descriptor
     contactInfo: {
       phone: '555-234-5678',
       address: '456 College Blvd, College Town'
@@ -42,6 +57,7 @@ export const mockStudents: Student[] = [
     enrolledCourses: ['course2', 'course3'],
     profileImageUrl: 'https://randomuser.me/api/portraits/women/3.jpg',
     consentGiven: false,
+    faceDescriptor: Array.from(generateConsistentDescriptor(3)), // Add consistent descriptor
     contactInfo: {
       phone: '555-345-6789',
       address: '789 Scholar St, College Town'
@@ -56,6 +72,7 @@ export const mockStudents: Student[] = [
     enrolledCourses: ['course1', 'course2'],
     profileImageUrl: 'https://randomuser.me/api/portraits/men/4.jpg',
     consentGiven: true,
+    faceDescriptor: Array.from(generateConsistentDescriptor(4)), // Add consistent descriptor
     contactInfo: {
       phone: '555-456-7890'
     },
@@ -69,6 +86,7 @@ export const mockStudents: Student[] = [
     enrolledCourses: ['course1', 'course3'],
     profileImageUrl: 'https://randomuser.me/api/portraits/women/5.jpg',
     consentGiven: true,
+    faceDescriptor: Array.from(generateConsistentDescriptor(5)), // Add consistent descriptor
     contactInfo: {
       phone: '555-567-8901',
       address: '101 Academic Way, College Town'

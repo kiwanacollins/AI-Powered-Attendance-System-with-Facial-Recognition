@@ -1,101 +1,62 @@
-#!/usr/bin/env node
-
-/**
- * This script downloads the required face-api.js models for facial recognition
- * and places them in the public/models directory so they're accessible to the app
- */
-
+import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import https from 'https';
 
-// Get current directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define models path
-const modelsDir = path.join(__dirname, '../public/models');
-
-// Define required models and their URLs
-const models = [
-  {
-    name: 'face_landmark_68_model-shard1',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/face_landmark_68_model-shard1?raw=true',
-    outputPath: path.join(modelsDir, 'face_landmark_68_model-shard1')
-  },
-  {
-    name: 'face_landmark_68_model-weights_manifest.json',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/face_landmark_68_model-weights_manifest.json?raw=true',
-    outputPath: path.join(modelsDir, 'face_landmark_68_model-weights_manifest.json')
-  },
-  {
-    name: 'face_recognition_model-shard1',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/face_recognition_model-shard1?raw=true',
-    outputPath: path.join(modelsDir, 'face_recognition_model-shard1')
-  },
-  {
-    name: 'face_recognition_model-shard2',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/face_recognition_model-shard2?raw=true',
-    outputPath: path.join(modelsDir, 'face_recognition_model-shard2')
-  },
-  {
-    name: 'face_recognition_model-weights_manifest.json',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/face_recognition_model-weights_manifest.json?raw=true',
-    outputPath: path.join(modelsDir, 'face_recognition_model-weights_manifest.json')
-  },
-  {
-    name: 'ssd_mobilenetv1_model-shard1',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/ssd_mobilenetv1_model-shard1?raw=true',
-    outputPath: path.join(modelsDir, 'ssd_mobilenetv1_model-shard1')
-  },
-  {
-    name: 'ssd_mobilenetv1_model-shard2',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/ssd_mobilenetv1_model-shard2?raw=true',
-    outputPath: path.join(modelsDir, 'ssd_mobilenetv1_model-shard2')
-  },
-  {
-    name: 'ssd_mobilenetv1_model-weights_manifest.json',
-    url: 'https://github.com/justadudewhohacks/face-api.js/blob/master/weights/ssd_mobilenetv1_model-weights_manifest.json?raw=true',
-    outputPath: path.join(modelsDir, 'ssd_mobilenetv1_model-weights_manifest.json')
-  }
-];
+const MODELS_DIR = path.join(path.dirname(__dirname), 'public', 'models');
 
 // Create models directory if it doesn't exist
-if (!fs.existsSync(modelsDir)) {
-  console.log(`Creating models directory at ${modelsDir}`);
-  fs.mkdirSync(modelsDir, { recursive: true });
+if (!fs.existsSync(MODELS_DIR)) {
+  fs.mkdirSync(MODELS_DIR, { recursive: true });
 }
 
-// Function to download a file
-const downloadFile = (url, outputPath) => {
+const MODEL_FILES = [
+  'ssd_mobilenetv1_model-weights_manifest.json',
+  'ssd_mobilenetv1_model-shard1',
+  'ssd_mobilenetv1_model-shard2',
+  'face_landmark_68_model-weights_manifest.json',
+  'face_landmark_68_model-shard1',
+  'face_recognition_model-weights_manifest.json',
+  'face_recognition_model-shard1',
+  'face_recognition_model-shard2'
+];
+
+const BASE_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+
+async function downloadFile(filename) {
+  const filepath = path.join(MODELS_DIR, filename);
+  const file = fs.createWriteStream(filepath);
+
   return new Promise((resolve, reject) => {
-    console.log(`Downloading ${path.basename(outputPath)}...`);
-    
-    const file = fs.createWriteStream(outputPath);
-    https.get(url, (response) => {
+    https.get(`${BASE_URL}/${filename}`, (response) => {
       response.pipe(file);
-      
       file.on('finish', () => {
         file.close();
-        console.log(`Downloaded ${path.basename(outputPath)}`);
+        console.log(`Downloaded: ${filename}`);
         resolve();
       });
     }).on('error', (err) => {
-      fs.unlink(outputPath);
-      console.error(`Error downloading ${path.basename(outputPath)}: ${err.message}`);
+      fs.unlink(filepath, () => {});
       reject(err);
     });
   });
-};
+}
 
-// Download all models
 async function downloadModels() {
-  console.log('Starting download of face-api.js models...');
+  console.log('Starting model downloads...');
   
   try {
-    // Download models in parallel
-    await Promise.all(models.map(model => downloadFile(model.url, model.outputPath)));
+    // First, clean the models directory
+    fs.readdirSync(MODELS_DIR).forEach(file => {
+      fs.unlinkSync(path.join(MODELS_DIR, file));
+    });
+    console.log('Cleaned existing model files');
+
+    // Download all model files
+    await Promise.all(MODEL_FILES.map(file => downloadFile(file)));
     console.log('All models downloaded successfully!');
   } catch (error) {
     console.error('Error downloading models:', error);
@@ -103,5 +64,4 @@ async function downloadModels() {
   }
 }
 
-// Run the download
-downloadModels();
+downloadModels(); 

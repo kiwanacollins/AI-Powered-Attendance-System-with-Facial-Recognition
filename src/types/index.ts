@@ -1,102 +1,145 @@
-// Basic data models for the attendance system
+// Define core types for the AI-Powered Attendance System
 
-// Student model
+// Student type definition
 export interface Student {
   id: string;
   name: string;
   studentId: string;
   email: string;
-  enrolledCourses: string[]; // Array of course IDs
-  faceDescriptor?: Float32Array; // Face recognition descriptor
+  enrolledCourses: string[];
   profileImageUrl?: string;
   consentGiven: boolean;
+  faceDescriptor?: number[]; // Stored as a regular array for JSON serialization
   contactInfo: {
     phone?: string;
     address?: string;
     emergencyContact?: string;
   };
-  createdAt: string; // ISO date string
+  createdAt: string;
 }
 
-// Course model
+// Course type definition
 export interface Course {
   id: string;
-  code: string; // e.g., "CS101"
+  code: string;
   name: string;
   instructor: string;
   schedule: {
-    days: string[]; // e.g., ["Monday", "Wednesday"]
-    startTime: string; // e.g., "09:00"
-    endTime: string; // e.g., "10:30"
+    days: string[];
+    startTime: string;
+    endTime: string;
   };
   location: string;
   semester: string;
   year: number;
 }
 
-// Attendance record model
+// Attendance record type definition
 export interface AttendanceRecord {
   id: string;
   studentId: string;
   courseId: string;
-  timestamp: string; // ISO date string
+  timestamp: string;
   status: 'Present' | 'Late' | 'Absent';
   captureMethod: 'Automatic' | 'Manual';
   notes?: string;
 }
 
-// System log model for error monitoring
+// System log type for error monitoring and event logging
 export interface SystemLog {
   id: string;
   type: 'Error' | 'Warning' | 'Info';
   message: string;
   severity: 'High' | 'Medium' | 'Low';
-  timestamp: string; // ISO date string
+  timestamp: string;
   errorCode?: string;
   suggestedResolution?: string;
-  context?: Record<string, any>;
 }
 
-// System configuration model
+// System configuration types
+export interface CameraSettings {
+  deviceId: string;
+}
+
+export interface DetectionSettings {
+  sensitivity: 'Low' | 'Medium' | 'High';
+  recognitionThreshold: number; // Value between 0 and 1, where lower is stricter
+}
+
+export interface SecuritySettings {
+  loginRequired: boolean;
+  sessionTimeout: number; // Minutes
+}
+
+export interface LoggingSettings {
+  interval: number | 'manual'; // Minutes or 'manual'
+  localStorageFallback: boolean;
+}
+
 export interface SystemConfig {
-  cameraSettings: {
-    deviceId: string;
-    resolution?: {
-      width: number;
-      height: number;
-    };
-  };
-  detectionSettings: {
-    sensitivity: 'Low' | 'Medium' | 'High';
-    recognitionThreshold: number; // 0-1 value for face recognition confidence
-  };
-  security: {
-    loginRequired: boolean;
-    sessionTimeout: number; // minutes
-  };
-  logging: {
-    interval: number; // minutes
-    localStorageFallback: boolean;
-  };
+  cameraSettings: CameraSettings;
+  detectionSettings: DetectionSettings;
+  security: SecuritySettings;
+  logging: LoggingSettings;
 }
 
-// Dashboard metrics models
-export interface AttendanceMetrics {
-  totalStudents: number;
-  averageAttendance: number;
-  minAttendance: number;
-  maxAttendance: number;
-}
-
-export interface AttendanceDistribution {
-  present: number;
-  late: number;
-  absent: number;
-}
-
-// Camera detection result
-export interface DetectionResult {
+// Face recognition types
+export interface FaceDetectionResult {
   studentId: string;
+  name: string;
   confidence: number;
-  timestamp: string;
+  box: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  timestamp: number;
+  recognized: boolean;
+}
+
+// Face recognition model loading status
+export enum ModelLoadStatus {
+  LOADING = 'loading',
+  LOADED = 'loaded',
+  ERROR = 'error',
+  NOT_INITIALIZED = 'not_initialized'
+}
+
+// Context interfaces
+export interface AppContextState {
+  students: Student[];
+  courses: Course[];
+  attendanceRecords: AttendanceRecord[];
+  systemLogs: SystemLog[];
+  systemConfig: SystemConfig;
+  addStudent: (student: Omit<Student, 'id' | 'createdAt'>) => void;
+  updateStudent: (id: string, studentData: Partial<Student>) => void;
+  deleteStudent: (id: string) => void;
+  addAttendanceRecord: (record: Omit<AttendanceRecord, 'id'>) => void;
+  addSystemLog: (log: Omit<SystemLog, 'id' | 'timestamp'>) => void;
+  clearSystemLogs: () => void;
+  updateSystemConfig: (config: Partial<SystemConfig>) => void;
+}
+
+// Dashboard stats
+export interface DashboardStats {
+  totalStudents: number;
+  totalCourses: number;
+  averageAttendance: number;
+  attendanceToday: number;
+}
+
+// Chart data interfaces
+export interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
+}
+
+export interface ChartDataset {
+  label: string;
+  data: number[];
+  backgroundColor?: string | string[];
+  borderColor?: string | string[];
+  borderWidth?: number;
 }

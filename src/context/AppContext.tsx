@@ -1,13 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   Student, 
   Course, 
   AttendanceRecord, 
   SystemLog, 
-  SystemConfig,
-  AttendanceMetrics,
-  AttendanceDistribution
+  SystemConfig, 
+  AppContextState
 } from '../types';
 import { 
   mockStudents, 
@@ -15,187 +14,155 @@ import {
   mockAttendanceRecords, 
   mockSystemLogs 
 } from '../utils/mockData';
+import { setSystemLogHandler } from '../services/faceRecognitionService';
 
-// Default system configuration
+// Interfaces for attendance metrics
+interface AttendanceMetrics {
+  totalStudents: number;
+  averageAttendance: number;
+  minAttendance: number;
+  maxAttendance: number;
+}
+
+interface AttendanceDistribution {
+  present: number;
+  late: number;
+  absent: number;
+}
+
+// Extended context props interface
+interface AppContextProps extends AppContextState {
+  getAttendanceMetrics: () => AttendanceMetrics;
+  getAttendanceDistribution: () => AttendanceDistribution;
+  addBulkAttendance: (records: Omit<AttendanceRecord, 'id'>[]) => void;
+}
+
+// Create a default system config
 const defaultSystemConfig: SystemConfig = {
   cameraSettings: {
-    deviceId: ''
+    deviceId: '',
   },
   detectionSettings: {
     sensitivity: 'Medium',
-    recognitionThreshold: 0.6
+    recognitionThreshold: 0.6,
   },
   security: {
-    loginRequired: false,
-    sessionTimeout: 30
+    loginRequired: true,
+    sessionTimeout: 30,
   },
   logging: {
     interval: 5,
-    localStorageFallback: true
-  }
+    localStorageFallback: true,
+  },
 };
 
-// Define the shape of our context
-interface AppContextProps {
-  // Data collections
-  students: Student[];
-  courses: Course[];
-  attendanceRecords: AttendanceRecord[];
-  systemLogs: SystemLog[];
-  systemConfig: SystemConfig;
-  
-  // Student management
-  addStudent: (student: Omit<Student, 'id'>) => void;
-  updateStudent: (updatedStudent: Student) => void;
-  deleteStudent: (studentId: string) => void;
-  
-  // Attendance management
-  addAttendanceRecord: (record: Omit<AttendanceRecord, 'id'>) => void;
-  addBulkAttendance: (records: Omit<AttendanceRecord, 'id'>[]) => void;
-  
-  // System logs
-  addSystemLog: (log: Omit<SystemLog, 'id' | 'timestamp'>) => void;
-  clearSystemLogs: () => void;
-  
-  // System configuration
-  updateSystemConfig: (config: Partial<SystemConfig>) => void;
-  
-  // Dashboard metrics
-  getAttendanceMetrics: () => AttendanceMetrics;
-  getAttendanceDistribution: () => AttendanceDistribution;
-}
+// Create the context with default values
+const AppContext = createContext<AppContextProps>({
+  students: [],
+  courses: [],
+  attendanceRecords: [],
+  systemLogs: [],
+  systemConfig: defaultSystemConfig,
+  addStudent: () => {},
+  updateStudent: () => {},
+  deleteStudent: () => {},
+  addAttendanceRecord: () => {},
+  addBulkAttendance: () => {},
+  addSystemLog: () => {},
+  clearSystemLogs: () => {},
+  updateSystemConfig: () => {},
+  getAttendanceMetrics: () => ({ 
+    totalStudents: 0, 
+    averageAttendance: 0, 
+    minAttendance: 0, 
+    maxAttendance: 0 
+  }),
+  getAttendanceDistribution: () => ({ 
+    present: 0, 
+    late: 0, 
+    absent: 0 
+  }),
+});
 
-// Create the context
-const AppContext = createContext<AppContextProps | undefined>(undefined);
-
-// Provider component
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // State for data collections
+// Provider component to wrap the application
+export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Initialize state with mock data
   const [students, setStudents] = useState<Student[]>(mockStudents);
   const [courses, setCourses] = useState<Course[]>(mockCourses);
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(mockAttendanceRecords);
   const [systemLogs, setSystemLogs] = useState<SystemLog[]>(mockSystemLogs);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>(defaultSystemConfig);
-
-  // Initialize camera device on mount
-  useEffect(() => {
-    const initCamera = async () => {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        
-        if (videoDevices.length > 0) {
-          setSystemConfig(prevConfig => ({
-            ...prevConfig,
-            cameraSettings: {
-              ...prevConfig.cameraSettings,
-              deviceId: videoDevices[0].deviceId
-            }
-          }));
-          
-          // Log camera initialization
-          addSystemLog({
-            type: 'Info',
-            message: `Found ${videoDevices.length} camera device(s)`,
-            severity: 'Low'
-          });
-        } else {
-          // Log error if no camera found
-          addSystemLog({
-            type: 'Warning',
-            message: 'No camera devices found',
-            severity: 'Medium',
-            suggestedResolution: 'Connect a webcam or enable camera access'
-          });
-        }
-      } catch (error) {
-        console.error('Error initializing camera:', error);
-        
-        // Log error
-        addSystemLog({
-          type: 'Error',
-          message: 'Failed to initialize camera devices',
-          severity: 'High',
-          errorCode: 'CAM_INIT_001',
-          suggestedResolution: 'Check browser permissions and try refreshing the page'
-        });
-      }
-    };
-    
-    initCamera();
-  }, []);
-
-  // Student management functions
-  const addStudent = useCallback((student: Omit<Student, 'id'>) => {
+  
+  // Function to add a new student
+  const addStudent = (student: Omit<Student, 'id' | 'createdAt'>) => {
     const newStudent: Student = {
       ...student,
-      id: uuidv4()
+      id: uuidv4(),
+      createdAt: new Date().toISOString(),
     };
-    
     setStudents(prevStudents => [...prevStudents, newStudent]);
     
-    // Log student addition
+    // Log the action
     addSystemLog({
       type: 'Info',
-      message: `Added new student: ${student.name} (${student.studentId})`,
-      severity: 'Low'
+      message: `New student added: ${student.name}`,
+      severity: 'Low',
     });
-  }, []);
-
-  const updateStudent = useCallback((updatedStudent: Student) => {
+  };
+  
+  // Function to update an existing student
+  const updateStudent = (id: string, studentData: Partial<Student>) => {
     setStudents(prevStudents => 
       prevStudents.map(student => 
-        student.id === updatedStudent.id ? updatedStudent : student
+        student.id === id ? { ...student, ...studentData } : student
       )
     );
     
-    // Log student update
+    // Log the action
     addSystemLog({
       type: 'Info',
-      message: `Updated student: ${updatedStudent.name} (${updatedStudent.studentId})`,
-      severity: 'Low'
+      message: `Student updated: ${id}`,
+      severity: 'Low',
     });
-  }, []);
-
-  const deleteStudent = useCallback((studentId: string) => {
-    const studentToDelete = students.find(s => s.id === studentId);
+  };
+  
+  // Function to delete a student
+  const deleteStudent = (id: string) => {
+    const studentToDelete = students.find(s => s.id === id);
+    setStudents(prevStudents => prevStudents.filter(student => student.id !== id));
     
-    setStudents(prevStudents => 
-      prevStudents.filter(student => student.id !== studentId)
-    );
-    
-    // Log student deletion
+    // Log the action
     if (studentToDelete) {
       addSystemLog({
-        type: 'Warning',
-        message: `Deleted student: ${studentToDelete.name} (${studentToDelete.studentId})`,
-        severity: 'Medium'
+        type: 'Info',
+        message: `Student deleted: ${studentToDelete.name}`,
+        severity: 'Medium',
       });
     }
-  }, [students]);
-
-  // Attendance management functions
-  const addAttendanceRecord = useCallback((record: Omit<AttendanceRecord, 'id'>) => {
+  };
+  
+  // Function to add an attendance record
+  const addAttendanceRecord = (record: Omit<AttendanceRecord, 'id'>) => {
     const newRecord: AttendanceRecord = {
       ...record,
-      id: uuidv4()
+      id: uuidv4(),
     };
-    
     setAttendanceRecords(prevRecords => [...prevRecords, newRecord]);
     
-    // Find student and course details for the log
+    // Find the student and course names for the log message
     const student = students.find(s => s.id === record.studentId);
     const course = courses.find(c => c.id === record.courseId);
     
-    // Log attendance record
+    // Log the action
     addSystemLog({
       type: 'Info',
-      message: `Recorded ${record.status} attendance for ${student?.name || 'Unknown Student'} in ${course?.code || 'Unknown Course'}`,
-      severity: 'Low'
+      message: `Attendance recorded: ${student?.name || 'Unknown student'} - ${course?.code || 'Unknown course'} - ${record.status}`,
+      severity: 'Low',
     });
-  }, [students, courses]);
-
-  const addBulkAttendance = useCallback((records: Omit<AttendanceRecord, 'id'>[]) => {
+  };
+  
+  // Function to add multiple attendance records at once
+  const addBulkAttendance = (records: Omit<AttendanceRecord, 'id'>[]) => {
     const newRecords = records.map(record => ({
       ...record,
       id: uuidv4()
@@ -203,54 +170,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     setAttendanceRecords(prevRecords => [...prevRecords, ...newRecords]);
     
-    // Get course details
-    const courseId = records[0]?.courseId;
-    const course = courses.find(c => c.id === courseId);
-    
-    // Count records by status
-    const presentCount = records.filter(r => r.status === 'Present').length;
-    const lateCount = records.filter(r => r.status === 'Late').length;
-    const absentCount = records.filter(r => r.status === 'Absent').length;
-    
-    // Log bulk attendance
+    // Log the action
     addSystemLog({
       type: 'Info',
-      message: `Bulk attendance recorded for ${course?.code || 'Unknown Course'}: ${presentCount} present, ${lateCount} late, ${absentCount} absent`,
-      severity: 'Low'
+      message: `Bulk attendance recorded: ${newRecords.length} entries`,
+      severity: 'Medium',
     });
-  }, [courses]);
-
-  // System logs functions
-  const addSystemLog = useCallback((log: Omit<SystemLog, 'id' | 'timestamp'>) => {
+  };
+  
+  // Function to add a system log
+  const addSystemLog = (log: Omit<SystemLog, 'id' | 'timestamp'>) => {
     const newLog: SystemLog = {
       ...log,
       id: uuidv4(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
     setSystemLogs(prevLogs => [newLog, ...prevLogs]);
-  }, []);
-
-  const clearSystemLogs = useCallback(() => {
+  };
+  
+  // Function to clear all system logs
+  const clearSystemLogs = () => {
     setSystemLogs([]);
     
-    // Add a log entry about clearing the logs
+    // Add a log for clearing logs
     const newLog: SystemLog = {
       id: uuidv4(),
-      type: 'Warning',
+      type: 'Info',
       message: 'All system logs cleared',
       severity: 'Medium',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
     setSystemLogs([newLog]);
-  }, []);
-
-  // System configuration function
-  const updateSystemConfig = useCallback((config: Partial<SystemConfig>) => {
+  };
+  
+  // Function to update system configuration
+  const updateSystemConfig = (config: Partial<SystemConfig>) => {
     setSystemConfig(prevConfig => ({
       ...prevConfig,
-      ...config
+      ...config,
+      // Handle nested objects
+      cameraSettings: {
+        ...prevConfig.cameraSettings,
+        ...(config.cameraSettings || {})
+      },
+      detectionSettings: {
+        ...prevConfig.detectionSettings,
+        ...(config.detectionSettings || {})
+      },
+      security: {
+        ...prevConfig.security,
+        ...(config.security || {})
+      },
+      logging: {
+        ...prevConfig.logging,
+        ...(config.logging || {})
+      }
     }));
     
     // Log config update
@@ -259,8 +233,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       message: 'System configuration updated',
       severity: 'Low'
     });
-  }, []);
-
+  };
+  
   // Dashboard metrics functions
   const getAttendanceMetrics = useCallback((): AttendanceMetrics => {
     const totalStudents = students.length;
@@ -301,7 +275,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       maxAttendance
     };
   }, [students, courses, attendanceRecords]);
-
+  
   const getAttendanceDistribution = useCallback((): AttendanceDistribution => {
     const present = attendanceRecords.filter(record => record.status === 'Present').length;
     const late = attendanceRecords.filter(record => record.status === 'Late').length;
@@ -313,7 +287,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       absent
     };
   }, [attendanceRecords]);
-
+  
+  // Register our log handler with the face recognition service
+  useEffect(() => {
+    setSystemLogHandler(addSystemLog);
+    
+    // Add an initialization log
+    addSystemLog({
+      type: 'Info',
+      message: 'System initialized',
+      severity: 'Low',
+    });
+    
+    // Check for locally stored system configuration
+    const storedConfig = localStorage.getItem('systemConfig');
+    if (storedConfig) {
+      try {
+        const parsedConfig = JSON.parse(storedConfig);
+        setSystemConfig(prevConfig => ({
+          ...prevConfig,
+          ...parsedConfig,
+        }));
+        
+        addSystemLog({
+          type: 'Info',
+          message: 'Loaded saved system configuration',
+          severity: 'Low',
+        });
+      } catch (error) {
+        console.error('Failed to parse stored system configuration:', error);
+        addSystemLog({
+          type: 'Warning',
+          message: 'Failed to load saved system configuration',
+          severity: 'Medium',
+          errorCode: 'CONFIG_001',
+          suggestedResolution: 'Check browser storage or reset configuration'
+        });
+      }
+    }
+  }, []);
+  
+  // Save configuration to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('systemConfig', JSON.stringify(systemConfig));
+    } catch (error) {
+      console.error('Failed to save system configuration to localStorage:', error);
+      addSystemLog({
+        type: 'Warning',
+        message: 'Failed to save system configuration',
+        severity: 'Medium',
+        errorCode: 'CONFIG_002',
+        suggestedResolution: 'Check browser storage permissions'
+      });
+    }
+  }, [systemConfig]);
+  
   // Combine all values and functions to be provided
   const contextValue: AppContextProps = {
     students,
@@ -332,13 +361,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     getAttendanceMetrics,
     getAttendanceDistribution
   };
-
+  
   return (
     <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );
 };
+
+// Export an alias for AppContextProvider as AppProvider to match imports in main.tsx
+export const AppProvider = AppContextProvider;
 
 // Custom hook for using the context
 export const useAppContext = () => {
