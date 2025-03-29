@@ -1,5 +1,19 @@
 import * as faceapi from 'face-api.js';
 import { Student, SystemLog } from '../types';
+import * as tf from '@tensorflow/tfjs';
+
+// Ensure TensorFlow.js is using the CPU backend for Raspberry Pi compatibility
+const setupTensorFlowBackend = async () => {
+  try {
+    // Force CPU backend
+    await tf.setBackend('cpu');
+    console.log('TensorFlow.js backend set to:', tf.getBackend());
+    return true;
+  } catch (error) {
+    console.error('Failed to set TensorFlow.js backend:', error);
+    return false;
+  }
+};
 
 // Global variable to store the system log function
 let systemLogFunction: ((log: SystemLog) => void) | null = null;
@@ -68,6 +82,9 @@ export const initializeFaceApi = async (modelUrl: string): Promise<boolean> => {
 
     // Set loading flag
     modelsLoading = true;
+    
+    // Setup TensorFlow backend first to ensure CPU usage on limited devices like Raspberry Pi
+    await setupTensorFlowBackend();
 
     // Ensure model URL doesn't have a trailing slash
     const baseUrl = modelUrl.endsWith('/') ? modelUrl.slice(0, -1) : modelUrl;
